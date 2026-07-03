@@ -1,0 +1,37 @@
+{
+  "name": "unihub-api",
+  "version": "1.0.0",
+  "description": "[![CI](https://github.com/THowle06/unihub-api/actions/workflows/ci.yml/badge.svg)](https://github.com/THowle06/unihub-api/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/THowle06/unihub-api/graph/badge.svg)](https://codecov.io/gh/THowle06/unihub-api)",
+  "homepage": "https://github.com/THowle06/unihub-api#readme",
+  "bugs": {
+    "url": "https://github.com/THowle06/unihub-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/THowle06/unihub-api.git"
+  },
+  "license": "MIT",
+  "author": "Tyler Howle",
+  "type": "commonjs",
+  "main": "server.ts",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.0",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.22.5",
+    "typescript": "^6.0.3"
+  }
+}
