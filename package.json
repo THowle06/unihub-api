@@ -13,7 +13,7 @@
   "license": "MIT",
   "author": "Tyler Howle",
   "type": "commonjs",
-  "main": "server.ts",
+  "main": "dist/server.ts",
   "directories": {
     "doc": "docs"
   },
