@@ -9,4 +9,16 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
-export const env = envSchema.parse(process.env);
+const result = envSchema.safeParse(process.env);
+
+if (!result.success) {
+  const issues = result.error.issues
+    .map((issue) => {
+      return `- ${issue.path.join(".")}: ${issue.message}`;
+    })
+    .join("\n");
+
+  throw new Error(`Invalid environment configuration:\n\n${issues}\n`);
+}
+
+export const env = result.data;
