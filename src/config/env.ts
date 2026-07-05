@@ -7,6 +7,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
 
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+
+  DATABASE_URL: z.url({
+    error: "DATABASE_URL must be a valid PostgreSQL connection URL.",
+  }),
 });
 
 const result = envSchema.safeParse(process.env);
