@@ -13,7 +13,7 @@
   "license": "MIT",
   "author": "Tyler Howle",
   "type": "commonjs",
-  "main": "dist/server.ts",
+  "main": "dist/server.js",
   "directories": {
     "doc": "docs"
   },
@@ -22,10 +22,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
@@ -34,13 +32,12 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.4",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.0",
-    "eslint": "^10.6.0",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.4",
-    "ts-node-dev": "^2.0.0",
     "tsx": "^4.22.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.1"

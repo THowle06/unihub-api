@@ -1,5 +1,5 @@
 import js from "@eslint/js";
-import tselint from "typescript-eslint";
+import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
@@ -9,21 +9,18 @@ export default [
 
   js.configs.recommended,
 
-  ...tselint.config.recommended,
-
-  eslintConfigPrettier,
-
-  {
-    files: ["src/**/*.ts"],
-
+  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
+    ...config,
+    files: ["**/*.ts"],
     languageOptions: {
+      ...config.languageOptions,
       parserOptions: {
+        ...config.languageOptions?.parserOptions,
         project: "./tsconfig.json",
+        tsconfigRootDir: import.meta.dirname,
       },
     },
+  })),
 
-    rules: {
-      "no-console": "warn",
-    },
-  },
+  eslintConfigPrettier,
 ];
