@@ -28,7 +28,7 @@ model Module {
   userId     String
   moduleCode String
   title      String
-  semsester  Int
+  semester   Int
   credits    Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -53,7 +53,7 @@ model Assignment {
 
   module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-  grades Grade?
+  grade Grade?
 }
 
 model Grade {
@@ -62,7 +62,7 @@ model Grade {
   score        Decimal
   feedback     String
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt()
+  updatedAt    DateTime @updatedAt
 
   assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 }
