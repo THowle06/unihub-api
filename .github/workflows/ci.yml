@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate API
@@ -45,6 +48,12 @@ jobs:
           NODE_ENV: test
           PORT: 3000
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
