@@ -1,19 +1,21 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import prisma from "../../lib/prisma";
 
-export const getHealth = async (req: Request, res: Response) => {
+import * as healthService from "./health.service";
+
+export const getHealth = (req: Request, res: Response) => {
+  const health = healthService.getHealth();
+
+  res.status(StatusCodes.OK).json(health);
+};
+
+export const getDatabaseHealth = async (req: Request, res: Response) => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    const health = await healthService.getDatabaseHealth();
 
-    return res.status(StatusCodes.OK).json({
-      status: "ok",
-      database: "connected",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    });
+    res.status(StatusCodes.OK).json(health);
   } catch {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
       status: "error",
       database: "disconnected",
       timestamp: new Date().toISOString(),
