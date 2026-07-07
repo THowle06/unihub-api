@@ -32,6 +32,10 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run linting
         run: npm run lint
