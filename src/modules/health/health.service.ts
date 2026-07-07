@@ -1,6 +1,7 @@
 import prisma from "../../lib/prisma";
+import { ApiHealthResponse, DatabaseHealthResponse } from "./health.types";
 
-export const getHealth = () => {
+export const getHealth = (): ApiHealthResponse => {
   return {
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -8,7 +9,7 @@ export const getHealth = () => {
   };
 };
 
-export const getDatabaseHealth = async () => {
+export const getDatabaseHealth = async (): Promise<DatabaseHealthResponse> => {
   await prisma.$queryRaw`SELECT 1`;
 
   return {
