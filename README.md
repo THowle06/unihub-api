@@ -21,11 +21,20 @@
 
 ## Overview
 
-UniHub API is the backend service that powers the UniHub platform.
+UniHub API is the backend service powering the UniHub platform.
 
-It provides a RESTful API for managing university-related data, including authentication, modules, assignments, grades, and academic progress. The API is designed to be consumed by multiple clients, including the UniHub web application and future mobile applications.
+It provides a RESTful API for managing university-related data including authentication, modules, assignments, grades and academic progress.
+The API is designed to be consumed by multiple clients, including the UniHub web application and future mobile applications.
 
-This project is being developed as a portfolio project to demonstrate backend software engineering practices, including API design, database modelling, authentication, testing, CI/CD, containerisation, and cloud deployment.
+This project is being developed as a portfolio project to demonstrate professional backend software engineering practices including:
+
+- REST API development
+- Database modelling
+- Authentication
+- Automated testing
+- CI/CD
+- Containerisation
+- Cloud deployment
 
 ---
 
@@ -33,17 +42,30 @@ This project is being developed as a portfolio project to demonstrate backend so
 
 🚧 **Currently in active development**
 
-Current phase:
+### Progress
 
 - [x] Project planning
 - [x] Requirements specification
 - [x] System architecture
 - [x] Database design
-- [ ] Project setup
+- [X] Project setup
 - [ ] Authentication
 - [ ] Core API implementation
-- [ ] Testing
 - [ ] Production deployment
+
+---
+
+## Current Features
+
+- Express REST API
+- Environment configuration and validation
+- Prisma ORM integration
+- PostgreSQL database support
+- Health check endpoints
+- Automated testing with Vitest and Supertest
+- GitHub Actions CI pipeline
+- Docker container support
+- Docker Compose local development environment
 
 ---
 
@@ -87,19 +109,19 @@ Current phase:
 The API follows a layered architecture.
 
 ```text
-Client Applications
-        │
-        ▼
-REST API (Express)
-        │
-        ▼
-Business Logic
-        │
-        ▼
-Prisma ORM
-        │
-        ▼
-PostgreSQL
+       Clients
+          │
+          ▼
+   Express REST API
+          │
+          ▼
+Controllers / Services
+          │
+          ▼
+    Prisma Client
+          │
+          ▼
+ PostgreSQL Database
 ```
 
 ---
@@ -133,8 +155,119 @@ PostgreSQL
 ### Infrastructure
 
 - Docker
+- Docker Compose
 - GitHub Actions
-- Render
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 24+
+- npm
+- PostgreSQL (or a Neon database)
+- Docker (optional)
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/THowle06/unihub-api.git
+cd unihub-api
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+### Configuration
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Populate the required environment variables before starting the application.
+
+### Development
+
+```bash
+npm run dev
+```
+
+### Production
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## Docker
+
+Build the application image:
+
+```bash
+docker build -t unihub-api .
+```
+
+Run the container:
+
+```bash
+docker run --env-file .env -p 3000:3000 unihub-api
+```
+
+Alternatively, run both the API and a local PostgreSQL database using Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+---
+
+## Available Scripts
+
+| Command                 | Description                   |
+| ----------------------- | ----------------------------- |
+| `npm run dev`           | Start the development server  |
+| `npm run build`         | Compile the application       |
+| `npm start`             | Run the compiled application  |
+| `npm test`              | Execute the test suite        |
+| `npm run test:coverage` | Generate test coverage        |
+| `npm run lint`          | Run ESLint                    |
+| `npm run lint:fix`      | Automatically fix lint issues |
+| `npm run format`        | Format the codebase           |
+| `npm run format:check`  | Check formatting              |
+| `npm run typecheck`     | Run TypeScript type checking  |
+
+---
+
+## API Health Endpoints
+
+| Endpoint               | Description                    |
+| ---------------------- | ------------------------------ |
+| `GET /health`          | Returns API health information |
+| `GET /health/database` | Verifies database connectivity |
+
+---
+
+## Continuous Integration
+
+Every push and pull request to the `main` branch automatically executes:
+
+- Dependency installation
+- Prisma Client generation
+- ESLint
+- Prettier formatting checks
+- TypeScript type checking
+- Vitest test suite
+- Code coverage reporting to Codecov
 
 ---
 
@@ -144,12 +277,15 @@ PostgreSQL
 .
 ├── docs/
 ├── prisma/
-├── scripts/
+│   ├── migrations/
+│   └── schema.prisma
 ├── src/
 │   ├── config/
 │   ├── lib/
 │   ├── middleware/
 │   ├── modules/
+│   │   └── health/
+│   ├── types/
 │   ├── app.ts
 │   └── server.ts
 ├── tests/
