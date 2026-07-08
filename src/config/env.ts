@@ -8,7 +8,9 @@ const envSchema = z.object({
 
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-  DATABASE_URL: z.url().optional(),
+  DATABASE_URL: z.string().startsWith("postgresql://", {
+    message: "DATABASE_URL must be a valid PostgreSQL connection URL.",
+  }),
 });
 
 const result = envSchema.safeParse(process.env);
@@ -23,10 +25,4 @@ if (!result.success) {
   throw new Error(`Invalid environment configuration:\n\n${issues}\n`);
 }
 
-const env = result.data;
-
-if (env.NODE_ENV !== "test" && !env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is required in non-test environments");
-}
-
-export { env };
+export const env = result.data;
