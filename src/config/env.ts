@@ -11,6 +11,10 @@ const envSchema = z.object({
   DATABASE_URL: z.string().startsWith("postgresql://", {
     message: "DATABASE_URL must be a valid PostgreSQL connection URL.",
   }),
+
+  BETTER_AUTH_SECRET: z.string().min(32),
+
+  BETTER_AUTH_URL: z.url(),
 });
 
 const result = envSchema.safeParse(process.env);
