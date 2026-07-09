@@ -48,7 +48,7 @@ This project is being developed as a portfolio project to demonstrate profession
 - [x] Requirements specification
 - [x] System architecture
 - [x] Database design
-- [X] Project setup
+- [x] Project setup
 - [ ] Authentication
 - [ ] Core API implementation
 - [ ] Production deployment
