@@ -14,6 +14,13 @@ export const signUpResponseSchema = z.object({
   user: authUserSchema,
 });
 
+export const signInResponseSchema = z.object({
+  token: z.string(),
+  user: authUserSchema,
+});
+
 export type AuthUser = z.infer<typeof authUserSchema>;
 
 export type SignUpResponse = z.infer<typeof signUpResponseSchema>;
+
+export type SignInResponse = z.infer<typeof signInResponseSchema>;
