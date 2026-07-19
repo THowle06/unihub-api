@@ -6,7 +6,7 @@ import prisma from "../src/lib/prisma";
 
 import { signUpResponseSchema, signInResponseSchema } from "../src/modules/auth/auth.types";
 
-import { createTestUser } from "./helpers/auth";
+import { createAuthenticatedAgent, createTestUser } from "./helpers/auth";
 
 describe("Authentication API", () => {
   describe("POST /api/auth/sign-up/email", () => {
@@ -137,6 +137,65 @@ describe("Authentication API", () => {
       });
 
       expect(response.status).toBeGreaterThanOrEqual(400);
+    });
+  });
+
+  describe("POST /api/auth/sign-out", () => {
+    it("logs out an authenticated user successfully", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const response = await agent.post("/api/auth/sign-out");
+
+      expect(response.status).toBe(200);
+
+      const cookies = response.headers["set-cookie"];
+
+      expect(Array.isArray(cookies)).toBe(true);
+
+      if (!Array.isArray(cookies)) {
+        throw new Error("Expected 'set-cookie' header to be an array.");
+      }
+
+      expect(cookies).toHaveLength(3);
+
+      expect(cookies[0]).toContain("better-auth.session_token=");
+      expect(cookies[0]).toContain("Max-Age=0");
+
+      expect(cookies[1]).toContain("better-auth.session_data=");
+      expect(cookies[1]).toContain("Max-Age=0");
+
+      expect(cookies[2]).toContain("better-auth.dont_remember=");
+      expect(cookies[2]).toContain("Max-Age=0");
+
+      const sessionResponse = await agent.get("/api/auth/get-session");
+
+      expect(sessionResponse.status).toBe(200);
+      expect(sessionResponse.body).toBeNull();
+    });
+
+    it("returns success when no authenticated session exists", async () => {
+      const response = await request(app).post("/api/auth/sign-out");
+
+      expect(response.status).toBe(200);
+
+      const cookies = response.headers["set-cookie"];
+
+      expect(Array.isArray(cookies)).toBe(true);
+
+      if (!Array.isArray(cookies)) {
+        throw new Error("Expected 'set-cookie' header to be an array.");
+      }
+
+      expect(cookies).toHaveLength(3);
+
+      expect(cookies[0]).toContain("better-auth.session_token=");
+      expect(cookies[0]).toContain("Max-Age=0");
+
+      expect(cookies[1]).toContain("better-auth.session_data=");
+      expect(cookies[1]).toContain("Max-Age=0");
+
+      expect(cookies[2]).toContain("better-auth.dont_remember=");
+      expect(cookies[2]).toContain("Max-Age=0");
     });
   });
 });
