@@ -24,3 +24,28 @@ export async function createTestUser() {
     response,
   };
 }
+
+export async function createAuthenticatedAgent() {
+  const agent = request.agent(app);
+
+  const email = `agent-${Date.now()}-${Math.random()}@example.com`;
+  const password = "Password123!";
+  const name = "Authenticated User";
+
+  const response = await agent.post("/api/auth/sign-up/email").send({
+    name,
+    email,
+    password,
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Failed to create authenticated user: ${JSON.stringify(response.body)}`);
+  }
+
+  return {
+    agent,
+    email,
+    password,
+    name,
+  };
+}
