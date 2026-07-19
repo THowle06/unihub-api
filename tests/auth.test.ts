@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import app from "../src/app";
 import prisma from "../src/lib/prisma";
-import { signUpResponseSchema } from "../src/modules/auth/auth.types";
+
+import { signUpResponseSchema, signInResponseSchema } from "../src/modules/auth/auth.types";
+
+import { createTestUser } from "./helpers/auth";
 
 describe("Authentication API", () => {
   describe("POST /api/auth/sign-up/email", () => {
@@ -77,6 +80,61 @@ describe("Authentication API", () => {
           email: `missing-name-${Date.now()}@example.com`,
           password: "Password123!",
         });
+
+      expect(response.status).toBeGreaterThanOrEqual(400);
+    });
+  });
+
+  describe("POST /api/auth/sign-in/email", () => {
+    it("logs in an existing user successfully", async () => {
+      const user = await createTestUser();
+
+      const response = await request(app).post("/api/auth/sign-in/email").send({
+        email: user.email,
+        password: user.password,
+      });
+
+      expect(response.status).toBe(200);
+
+      const body = signInResponseSchema.parse(response.body);
+
+      expect(body.user).toMatchObject({
+        name: user.name,
+        email: user.email,
+        emailVerified: false,
+      });
+
+      expect(body.token).toEqual(expect.any(String));
+
+      expect(response.headers["set-cookie"]).toBeDefined();
+
+      const session = await prisma.session.findFirst({
+        where: {
+          user: {
+            email: user.email,
+          },
+        },
+      });
+
+      expect(session).not.toBeNull();
+    });
+
+    it("rejects invalid passwords", async () => {
+      const user = await createTestUser();
+
+      const response = await request(app).post("/api/auth/sign-in/email").send({
+        email: user.email,
+        password: "WrongPassword123!",
+      });
+
+      expect(response.status).toBeGreaterThanOrEqual(400);
+    });
+
+    it("rejects unknown users", async () => {
+      const response = await request(app).post("/api/auth/sign-in/email").send({
+        email: "unknown@example.com",
+        password: "Password123!",
+      });
 
       expect(response.status).toBeGreaterThanOrEqual(400);
     });
