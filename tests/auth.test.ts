@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 import app from "../src/app";
 import prisma from "../src/lib/prisma";
 
-import { signUpResponseSchema, signInResponseSchema } from "../src/modules/auth/auth.types";
+import {
+  signUpResponseSchema,
+  signInResponseSchema,
+  sessionResponseSchema,
+} from "../src/modules/auth/auth.types";
 
 import { createAuthenticatedAgent, createTestUser } from "./helpers/auth";
 
@@ -196,6 +200,33 @@ describe("Authentication API", () => {
 
       expect(cookies[2]).toContain("better-auth.dont_remember=");
       expect(cookies[2]).toContain("Max-Age=0");
+    });
+  });
+
+  describe("GET /api/auth/get-session", () => {
+    it("returns the authenticated user's session", async () => {
+      const { agent, email, name } = await createAuthenticatedAgent();
+
+      const response = await agent.get("/api/auth/get-session");
+
+      expect(response.status).toBe(200);
+
+      const body = sessionResponseSchema.parse(response.body);
+
+      expect(body.user).toMatchObject({
+        email,
+        name,
+      });
+
+      expect(body.session.id).toEqual(expect.any(String));
+      expect(body.session.expiresAt).toEqual(expect.any(String));
+    });
+
+    it("rejects unauthenticated requests", async () => {
+      const response = await request(app).get("/api/auth/get-session");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toBeNull();
     });
   });
 });
