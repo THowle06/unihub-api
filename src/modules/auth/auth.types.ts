@@ -19,8 +19,22 @@ export const signInResponseSchema = z.object({
   user: authUserSchema,
 });
 
+export const authSessionSchema = z.object({
+  id: z.string(),
+  expiresAt: z.string(),
+});
+
+export const sessionResponseSchema = z.object({
+  session: authSessionSchema,
+  user: authUserSchema,
+});
+
 export type AuthUser = z.infer<typeof authUserSchema>;
 
 export type SignUpResponse = z.infer<typeof signUpResponseSchema>;
 
 export type SignInResponse = z.infer<typeof signInResponseSchema>;
+
+export type AuthSession = z.infer<typeof authSessionSchema>;
+
+export type SessionResponse = z.infer<typeof sessionResponseSchema>;
