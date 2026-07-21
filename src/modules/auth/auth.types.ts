@@ -29,6 +29,11 @@ export const sessionResponseSchema = z.object({
   user: authUserSchema,
 });
 
+export const protectedResponseSchema = z.object({
+  message: z.string(),
+  user: authUserSchema,
+});
+
 export type AuthUser = z.infer<typeof authUserSchema>;
 
 export type SignUpResponse = z.infer<typeof signUpResponseSchema>;
@@ -38,3 +43,5 @@ export type SignInResponse = z.infer<typeof signInResponseSchema>;
 export type AuthSession = z.infer<typeof authSessionSchema>;
 
 export type SessionResponse = z.infer<typeof sessionResponseSchema>;
+
+export type ProtectedResponse = z.infer<typeof protectedResponseSchema>;
