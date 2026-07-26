@@ -26,3 +26,23 @@ export async function createModule(userId: string, data: CreateModuleRequest) {
     },
   });
 }
+
+export async function getModules(userId: string) {
+  return prisma.module.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export async function getModuleById(moduleId: string, userId: string) {
+  return prisma.module.findFirst({
+    where: {
+      id: moduleId,
+      userId,
+    },
+  });
+}
