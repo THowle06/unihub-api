@@ -4,15 +4,22 @@ export const createModuleSchema = z.object({
   moduleCode: z
     .string()
     .trim()
-    .min(1)
-    .max(20)
+    .min(1, "Module code is required")
+    .max(20, "Module code must not exceed 20 characters")
     .transform((value) => value.toUpperCase()),
 
-  title: z.string().trim().min(1).max(100),
+  title: z
+    .string()
+    .trim()
+    .min(1, "Module title is required")
+    .max(100, "Module title must not exceed 100 characters"),
 
-  semester: z.number().int().min(1).max(2),
+  semester: z
+    .int("Semsester must be an integer")
+    .min(1, "Semester must be at least 1")
+    .max(2, "Semester must be at most 2"),
 
-  credits: z.number().int().positive(),
+  credits: z.int("Credits must be an integer").positive("Credits must be greater than 0"),
 });
 
 export const moduleResponseSchema = z.object({
@@ -28,9 +35,9 @@ export const moduleResponseSchema = z.object({
 
   credits: z.number(),
 
-  createdAt: z.string(),
+  createdAt: z.iso.datetime(),
 
-  updatedAt: z.string(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type CreateModuleRequest = z.infer<typeof createModuleSchema>;
