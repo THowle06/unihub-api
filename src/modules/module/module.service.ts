@@ -1,0 +1,28 @@
+import prisma from "../../lib/prisma";
+
+import { CreateModuleRequest } from "./module.types";
+
+export async function createModule(userId: string, data: CreateModuleRequest) {
+  const existingModule = await prisma.module.findUnique({
+    where: {
+      userId_moduleCode: {
+        userId,
+        moduleCode: data.moduleCode,
+      },
+    },
+  });
+
+  if (existingModule) {
+    throw new Error("Module already exists");
+  }
+
+  return prisma.module.create({
+    data: {
+      userId,
+      moduleCode: data.moduleCode,
+      title: data.title,
+      semester: data.semester,
+      credits: data.credits,
+    },
+  });
+}
