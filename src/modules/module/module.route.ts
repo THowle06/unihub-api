@@ -1,10 +1,16 @@
 import { Router } from "express";
 
 import { requireAuth } from "../../middleware/auth.middleware";
-import { createModule } from "./module.controller";
+import { createModule, getModuleById, getModules } from "./module.controller";
 
 const router = Router();
 
-router.post("/", requireAuth, createModule);
+router.use(requireAuth);
+
+router.post("/", createModule);
+
+router.get("/", getModules);
+
+router.get("/:id", getModuleById);
 
 export default router;

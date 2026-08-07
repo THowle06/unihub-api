@@ -3,15 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import app from "../src/app";
 import prisma from "../src/lib/prisma";
-import { moduleResponseSchema } from "../src/modules/module/module.types";
+import { moduleListResponseSchema, moduleResponseSchema } from "../src/modules/module/module.types";
 import { createAuthenticatedAgent } from "./helpers/auth";
-// import { clearDatabase } from "./helpers/database";
 
 describe("Module API", () => {
-  // afterEach(async () => {
-  //   await clearDatabase();
-  // });
-
   describe("POST /api/modules", () => {
     it("creates a module successfully", async () => {
       const { agent } = await createAuthenticatedAgent();
@@ -103,6 +98,105 @@ describe("Module API", () => {
 
       expect(firstResponse.status).toBe(201);
       expect(secondResponse.status).toBe(201);
+    });
+  });
+
+  describe("GET /api/modules", () => {
+    it("returns all modules for the authenticated user", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      await agent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      await agent.post("/api/modules").send({
+        moduleCode: "COMP3020",
+        title: "Distributed Systems",
+        semester: 2,
+        credits: 20,
+      });
+
+      const response = await agent.get("/api/modules");
+
+      expect(response.status).toBe(200);
+
+      const modules = moduleListResponseSchema.parse(response.body);
+
+      expect(modules).toHaveLength(2);
+
+      expect(modules[0].userId).toBe(modules[1].userId);
+
+      expect(modules.map((m) => m.moduleCode)).toEqual(
+        expect.arrayContaining(["COMP3010", "COMP3020"]),
+      );
+
+      expect(modules.map((m) => m.title)).toEqual(
+        expect.arrayContaining(["Software Engineering", "Distributed Systems"]),
+      );
+    });
+  });
+
+  describe("GET /api/modules/:id", () => {
+    it("returns a module by id", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const createResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      expect(createResponse.status).toBe(201);
+
+      const createdModule = moduleResponseSchema.parse(createResponse.body);
+
+      const response = await agent.get(`/api/modules/${createdModule.id}`);
+
+      expect(response.status).toBe(200);
+
+      const module = moduleResponseSchema.parse(response.body);
+
+      expect(module.id).toBe(createdModule.id);
+      expect(module.moduleCode).toBe("COMP3010");
+      expect(module.title).toBe("Software Engineering");
+    });
+
+    it("returns 404 for an unknown module", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const response = await agent.get("/api/modules/00000000-0000-0000-0000-000000000000");
+
+      expect(response.status).toBe(404);
+    });
+
+    it("does not allow access to another user's module", async () => {
+      const { agent: firstUser } = await createAuthenticatedAgent();
+      const { agent: secondUser } = await createAuthenticatedAgent();
+
+      const createResponse = await firstUser.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      expect(createResponse.status).toBe(201);
+
+      const createdModule = moduleResponseSchema.parse(createResponse.body);
+
+      const response = await secondUser.get(`/api/modules/${createdModule.id}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it("rejects unauthenticated requests", async () => {
+      const response = await request(app).get("/api/modules/00000000-0000-0000-0000-000000000000");
+
+      expect(response.status).toBe(401);
     });
   });
 });
