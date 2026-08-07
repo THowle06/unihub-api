@@ -1,6 +1,6 @@
 import prisma from "../../lib/prisma";
 
-import { CreateModuleRequest } from "./module.types";
+import { CreateModuleRequest, UpdateModuleRequest } from "./module.types";
 
 export async function createModule(userId: string, data: CreateModuleRequest) {
   const existingModule = await prisma.module.findUnique({
@@ -44,5 +44,25 @@ export async function getModuleById(userId: string, moduleId: string) {
       id: moduleId,
       userId,
     },
+  });
+}
+
+export async function updateModule(userId: string, moduleId: string, data: UpdateModuleRequest) {
+  const existingModule = await prisma.module.findFirst({
+    where: {
+      id: moduleId,
+      userId,
+    },
+  });
+
+  if (!existingModule) {
+    return null;
+  }
+
+  return prisma.module.update({
+    where: {
+      id: moduleId,
+    },
+    data,
   });
 }
