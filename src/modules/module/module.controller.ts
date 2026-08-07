@@ -128,7 +128,7 @@ export async function updateModule(req: Request, res: Response) {
       });
     }
 
-    const module = await moduleService.updateModule(moduleId, req.user.id, body);
+    const module = await moduleService.updateModule(req.user.id, moduleId, body);
 
     if (!module) {
       return res.status(StatusCodes.NOT_FOUND).json({
