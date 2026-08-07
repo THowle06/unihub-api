@@ -40,6 +40,10 @@ export const moduleResponseSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+export const moduleListResponseSchema = z.array(moduleResponseSchema);
+
 export type CreateModuleRequest = z.infer<typeof createModuleSchema>;
 
 export type ModuleResponse = z.infer<typeof moduleResponseSchema>;
+
+export type ModuleListResponse = z.infer<typeof moduleListResponseSchema>;

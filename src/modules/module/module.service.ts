@@ -38,7 +38,7 @@ export async function getModules(userId: string) {
   });
 }
 
-export async function getModuleById(moduleId: string, userId: string) {
+export async function getModuleById(userId: string, moduleId: string) {
   return prisma.module.findFirst({
     where: {
       id: moduleId,
