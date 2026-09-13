@@ -66,3 +66,22 @@ export async function updateModule(userId: string, moduleId: string, data: Updat
     data,
   });
 }
+
+export async function deleteModule(moduleId: string, userId: string) {
+  const existingModule = await prisma.module.findFirst({
+    where: {
+      id: moduleId,
+      userId,
+    },
+  });
+
+  if (!existingModule) {
+    return null;
+  }
+
+  return prisma.module.delete({
+    where: {
+      id: moduleId,
+    },
+  });
+}
