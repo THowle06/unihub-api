@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { ZodError } from "zod";
 
 import * as moduleService from "./module.service";
-import { createModuleSchema, moduleResponseSchema } from "./module.types";
+import { createModuleSchema, moduleResponseSchema, updateModuleSchema } from "./module.types";
 import { StatusCodes } from "http-status-codes";
 
 type ModuleParams = {
@@ -103,6 +103,55 @@ export async function getModuleById(req: Request<ModuleParams>, res: Response) {
     return res.status(StatusCodes.OK).json(response);
   } catch (error) {
     console.error(error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Internal Server Error",
+    });
+  }
+}
+
+export async function updateModule(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const body = updateModuleSchema.parse(req.body);
+
+    const moduleId = req.params.id;
+
+    if (Array.isArray(moduleId)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Invalid module ID",
+      });
+    }
+
+    const module = await moduleService.updateModule(req.user.id, moduleId, body);
+
+    if (!module) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "Module not found",
+      });
+    }
+
+    const response = moduleResponseSchema.parse({
+      ...module,
+      createdAt: module.createdAt.toISOString(),
+      updatedAt: module.updatedAt.toISOString(),
+    });
+
+    return res.status(StatusCodes.OK).json(response);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Validation failed",
+        errors: error.issues,
+      });
+    }
+
+    console.log(error);
 
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Internal Server Error",

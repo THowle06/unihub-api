@@ -199,4 +199,88 @@ describe("Module API", () => {
       expect(response.status).toBe(401);
     });
   });
+
+  describe("PATCH /api/modules/:id", () => {
+    it("updates a module successfully", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const createResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      const createdModule = moduleResponseSchema.parse(createResponse.body);
+
+      const response = await agent.patch(`/api/modules/${createdModule.id}`).send({
+        title: "Advanced Software Engineering",
+        credits: 30,
+      });
+
+      expect(response.status).toBe(200);
+
+      const updatedModule = moduleResponseSchema.parse(response.body);
+
+      expect(updatedModule.id).toBe(createdModule.id);
+      expect(updatedModule.moduleCode).toBe("COMP3010");
+      expect(updatedModule.title).toBe("Advanced Software Engineering");
+      expect(updatedModule.credits).toBe(30);
+    });
+
+    it("rejects invalid module updates", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const createResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      const createdModule = moduleResponseSchema.parse(createResponse.body);
+
+      const response = await agent.patch(`/api/modules/${createdModule.id}`).send({ credits: -10 });
+
+      expect(response.status).toBe(400);
+    });
+
+    it("prevents users updating another user's module", async () => {
+      const { agent: firstUser } = await createAuthenticatedAgent();
+      const { agent: secondUser } = await createAuthenticatedAgent();
+
+      const createResponse = await firstUser.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      const module = moduleResponseSchema.parse(createResponse.body);
+
+      const response = await secondUser.patch(`/api/modules/${module.id}`).send({
+        title: "Modified By Another User",
+      });
+
+      expect(response.status).toBe(404);
+    });
+
+    it("returns 404 when updating a non-existent module", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const response = await agent.patch("/api/modules/00000000-0000-0000-0000-000000000000").send({
+        title: "Does Not Exist",
+      });
+
+      expect(response.status).toBe(404);
+    });
+
+    it("rejects unauthenticated requests", async () => {
+      const response = await request(app).patch("/api/modules/some-id").send({
+        title: "Updated Title",
+      });
+
+      expect(response.status).toBe(401);
+    });
+  });
 });

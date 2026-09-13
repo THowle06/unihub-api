@@ -42,8 +42,12 @@ export const moduleResponseSchema = z.object({
 
 export const moduleListResponseSchema = z.array(moduleResponseSchema);
 
+export const updateModuleSchema = createModuleSchema.partial();
+
 export type CreateModuleRequest = z.infer<typeof createModuleSchema>;
 
 export type ModuleResponse = z.infer<typeof moduleResponseSchema>;
 
 export type ModuleListResponse = z.infer<typeof moduleListResponseSchema>;
+
+export type UpdateModuleRequest = z.infer<typeof updateModuleSchema>;
