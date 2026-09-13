@@ -283,4 +283,106 @@ describe("Module API", () => {
       expect(response.status).toBe(401);
     });
   });
+
+  describe("DELETE /api/modules/:id", () => {
+    it("deletes a module successfully", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const createResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      expect(createResponse.status).toBe(201);
+
+      const moduleId = moduleResponseSchema.parse(createResponse.body).id;
+
+      const deleteResponse = await agent.delete(`/api/modules/${moduleId}`);
+
+      expect(deleteResponse.status).toBe(204);
+
+      const getResponse = await agent.get(`/api/modules/${moduleId}`);
+
+      expect(getResponse.status).toBe(404);
+    });
+
+    it("prevents users from deleting another user's module", async () => {
+      const { agent: ownerAgent } = await createAuthenticatedAgent();
+      const { agent: otherAgent } = await createAuthenticatedAgent();
+
+      const createResponse = await ownerAgent.post("/api/modules").send({
+        moduleCode: "COMP3010",
+        title: "Software Engineering",
+        semester: 1,
+        credits: 20,
+      });
+
+      expect(createResponse.status).toBe(201);
+
+      const moduleId = moduleResponseSchema.parse(createResponse.body).id;
+
+      const deleteResponse = await otherAgent.delete(`/api/modules/${moduleId}`);
+
+      expect(deleteResponse.status).toBe(404);
+
+      const getResponse = await ownerAgent.get(`/api/modules/${moduleId}`);
+
+      expect(getResponse.status).toBe(200);
+    });
+
+    it("returns 404 when the module does not exist", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const response = await agent.delete("/api/modules/00000000-0000-0000-0000-000000000000");
+
+      expect(response.status).toBe(404);
+    });
+
+    it("rejects unauthenticated requests", async () => {
+      const response = await request(app).delete(
+        "/api/modules/00000000-0000-0000-0000-000000000000",
+      );
+
+      expect(response.status).toBe(401);
+    });
+
+    it("deletes related assignments when a module is deleted", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const createResponse = await agent.post("/api/modules").send({
+        moduleCode: "CS-CASCADE",
+        title: "Cascade Test Module",
+        semester: 2,
+        credits: 20,
+      });
+
+      expect(createResponse.status).toBe(201);
+
+      const moduleId = moduleResponseSchema.parse(createResponse.body).id;
+
+      await prisma.assignment.create({
+        data: {
+          moduleId,
+          title: "Cascase Test Assignment",
+          dueDate: new Date("2026-12-01"),
+          weighting: 50,
+          status: "NOT_STARTED",
+        },
+      });
+
+      const deleteResponse = await agent.delete(`/api/modules/${moduleId}`);
+
+      expect(deleteResponse.status).toBe(204);
+
+      const assignments = await prisma.assignment.findMany({
+        where: {
+          moduleId,
+        },
+      });
+
+      expect(assignments).toHaveLength(0);
+    });
+  });
 });
