@@ -1,7 +1,13 @@
 import { Router } from "express";
 
 import { requireAuth } from "../../middleware/auth.middleware";
-import { createModule, getModuleById, getModules, updateModule } from "./module.controller";
+import {
+  createModule,
+  deleteModule,
+  getModuleById,
+  getModules,
+  updateModule,
+} from "./module.controller";
 
 const router = Router();
 
@@ -14,5 +20,7 @@ router.get("/", getModules);
 router.get("/:id", getModuleById);
 
 router.patch("/:id", updateModule);
+
+router.delete("/:id", deleteModule);
 
 export default router;
