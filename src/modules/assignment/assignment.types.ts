@@ -26,7 +26,7 @@ export const assignmentResponseSchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
   dueDate: z.iso.datetime(),
-  weighting: z.number(),
+  weighting: z.coerce.number(),
   status: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "SUBMITTED"]),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
