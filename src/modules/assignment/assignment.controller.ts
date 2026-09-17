@@ -161,3 +161,37 @@ export async function updateAssignment(req: Request, res: Response) {
     });
   }
 }
+
+export async function deleteAssignment(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const assignmentId = req.params.id;
+
+    if (Array.isArray(assignmentId)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Invalid assignment ID",
+      });
+    }
+
+    const assignment = await assigmmentServive.deleteAssignment(req.user.id, assignmentId);
+
+    if (!assignment) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "Assignment not found",
+      });
+    }
+
+    return res.status(StatusCodes.NO_CONTENT).send();
+  } catch (error) {
+    console.error(error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Internal Server Error",
+    });
+  }
+}

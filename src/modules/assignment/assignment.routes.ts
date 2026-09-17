@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../../middleware/auth.middleware";
 import {
   createAssignment,
+  deleteAssignment,
   getAssignmentById,
   getAssignments,
   updateAssignment,
@@ -18,5 +19,7 @@ router.get("/", getAssignments);
 router.get("/:id", getAssignmentById);
 
 router.patch("/:id", updateAssignment);
+
+router.delete("/:id", deleteAssignment);
 
 export default router;

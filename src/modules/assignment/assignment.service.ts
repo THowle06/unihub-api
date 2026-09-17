@@ -79,3 +79,24 @@ export async function updateAssignment(
     },
   });
 }
+
+export async function deleteAssignment(userId: string, assignmentId: string) {
+  const existingAssignment = await prisma.assignment.findFirst({
+    where: {
+      id: assignmentId,
+      module: {
+        userId,
+      },
+    },
+  });
+
+  if (!existingAssignment) {
+    return null;
+  }
+
+  return prisma.assignment.delete({
+    where: {
+      id: assignmentId,
+    },
+  });
+}
