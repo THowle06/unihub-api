@@ -375,4 +375,90 @@ describe("Assignment API", () => {
       expect(response.status).toBe(401);
     });
   });
+
+  describe("DELETE /api/assignments/:id", () => {
+    it("deletes an assignment successfully", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const moduleResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3015",
+        title: "Software Architecture",
+        semester: 1,
+        credits: 20,
+      });
+
+      expect(moduleResponse.status).toBe(201);
+
+      const moduleId = moduleResponseSchema.parse(moduleResponse.body).id;
+
+      const assignmentResponse = await agent.post("/api/assignments").send({
+        moduleId,
+        title: "Coursework",
+        dueDate: "2026-12-01T12:00:00.000Z",
+        weighting: 30,
+        status: "NOT_STARTED",
+      });
+
+      expect(assignmentResponse.status).toBe(201);
+
+      const assignmentId = assignmentResponseSchema.parse(assignmentResponse.body).id;
+
+      const response = await agent.delete(`/api/assignments/${assignmentId}`);
+
+      expect(response.status).toBe(204);
+      expect(response.body).toEqual({});
+
+      const getResponse = await agent.get(`/api/assignments/${assignmentId}`);
+
+      expect(getResponse.status).toBe(404);
+    });
+
+    it("prevents another user from deleting an assignment", async () => {
+      const { agent } = await createAuthenticatedAgent();
+      const { agent: otherAgent } = await createAuthenticatedAgent();
+
+      const moduleResponse = await agent.post("/api/modules").send({
+        moduleCode: "COMP3015",
+        title: "Software Architecture",
+        semester: 1,
+        credits: 20,
+      });
+
+      const moduleId = moduleResponseSchema.parse(moduleResponse.body).id;
+
+      const assignmentResponse = await agent.post("/api/assignments").send({
+        moduleId,
+        title: "Coursework",
+        dueDate: "2026-12-01T12:00:00.000Z",
+        weighting: 30,
+        status: "NOT_STARTED",
+      });
+
+      const assignmentId = assignmentResponseSchema.parse(assignmentResponse.body).id;
+
+      const response = await otherAgent.delete(`/api/assignment/${assignmentId}`);
+
+      expect(response.status).toBe(404);
+
+      const getResponse = await agent.get(`/api/assignments/${assignmentId}`);
+
+      expect(getResponse.status).toBe(200);
+    });
+
+    it("returns 404 when deleting a non-existent assignmemt", async () => {
+      const { agent } = await createAuthenticatedAgent();
+
+      const response = await agent.delete("/api/assignmemts/00000000-0000-0000-0000-000000000000");
+
+      expect(response.status).toBe(404);
+    });
+
+    it("rejects unauthorised assignment deletion", async () => {
+      const response = await request(app).delete(
+        "/api/assignments/00000000-0000-0000-0000-000000000000",
+      );
+
+      expect(response.status).toBe(401);
+    });
+  });
 });
