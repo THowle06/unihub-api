@@ -24,3 +24,27 @@ export async function createAssignment(userId: string, data: CreateAssignmentReq
     },
   });
 }
+
+export async function getAssignments(userId: string) {
+  return prisma.assignment.findMany({
+    where: {
+      module: {
+        userId,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export async function getAssignmentById(userId: string, assignmentId: string) {
+  return prisma.assignment.findFirst({
+    where: {
+      id: assignmentId,
+      module: {
+        userId,
+      },
+    },
+  });
+}
