@@ -7,6 +7,7 @@ import { requireAuth } from "./middleware/auth.middleware";
 
 import healthRouter from "./modules/health";
 import { moduleRouter } from "./modules/module";
+import { assignmentRouter } from "./modules/assignment";
 
 const app = express();
 
@@ -28,5 +29,7 @@ app.get("/api/protected", requireAuth, (req, res) => {
 app.use("/health", healthRouter);
 
 app.use("/api/modules", moduleRouter);
+
+app.use("/api/assignments", assignmentRouter);
 
 export default app;
