@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { requireAuth } from "../../middleware/auth.middleware";
-import { createAssignment, getAssignmentById, getAssignments } from "./assignment.controller";
+import {
+  createAssignment,
+  getAssignmentById,
+  getAssignments,
+  updateAssignment,
+} from "./assignment.controller";
 
 const router = Router();
 
@@ -11,5 +16,7 @@ router.post("/", createAssignment);
 router.get("/", getAssignments);
 
 router.get("/:id", getAssignmentById);
+
+router.patch("/:id", updateAssignment);
 
 export default router;

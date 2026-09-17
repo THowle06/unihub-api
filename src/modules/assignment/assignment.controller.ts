@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { assignmentResponseSchema, createAssignmentSchema } from "./assignment.types";
+import {
+  assignmentResponseSchema,
+  createAssignmentSchema,
+  updateAssignmentSchema,
+} from "./assignment.types";
 import * as assigmmentServive from "./assignment.service";
+import { ZodError } from "zod";
 
 type AssignmentParams = {
   id: string;
@@ -96,6 +101,56 @@ export async function getAssignmentById(req: Request<AssignmentParams>, res: Res
 
     return res.status(StatusCodes.OK).json(response);
   } catch (error) {
+    console.error(error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Internal Server Error",
+    });
+  }
+}
+
+export async function updateAssignment(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const body = updateAssignmentSchema.parse(req.body);
+
+    const assignmentId = req.params.id;
+
+    if (Array.isArray(assignmentId)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Invalid assignment ID",
+      });
+    }
+
+    const assignment = await assigmmentServive.updateAssignment(req.user.id, assignmentId, body);
+
+    if (!assignment) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "Assignment not found",
+      });
+    }
+
+    const response = assignmentResponseSchema.parse({
+      ...assignment,
+      dueDate: assignment.dueDate.toISOString(),
+      createdAt: assignment.createdAt.toISOString(),
+      updatedAt: assignment.updatedAt.toISOString(),
+    });
+
+    return res.status(StatusCodes.OK).json(response);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Validation failed",
+        errors: error.issues,
+      });
+    }
+
     console.error(error);
 
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

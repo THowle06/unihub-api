@@ -32,6 +32,10 @@ export const assignmentResponseSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+export const updateAssignmentSchema = createAssignmentSchema.omit({ moduleId: true }).partial();
+
 export type CreateAssignmentRequest = z.infer<typeof createAssignmentSchema>;
 
 export type AssignmentResponse = z.infer<typeof assignmentResponseSchema>;
+
+export type UpdateAssignmentRequest = z.infer<typeof updateAssignmentSchema>;

@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import type { CreateAssignmentRequest } from "./assignment.types";
+import type { CreateAssignmentRequest, UpdateAssignmentRequest } from "./assignment.types";
 
 export async function createAssignment(userId: string, data: CreateAssignmentRequest) {
   const module = await prisma.module.findFirst({
@@ -45,6 +45,37 @@ export async function getAssignmentById(userId: string, assignmentId: string) {
       module: {
         userId,
       },
+    },
+  });
+}
+
+export async function updateAssignment(
+  userId: string,
+  assignmentId: string,
+  data: UpdateAssignmentRequest,
+) {
+  const existingAssignment = await prisma.assignment.findFirst({
+    where: {
+      id: assignmentId,
+      module: {
+        userId,
+      },
+    },
+  });
+
+  if (!existingAssignment) {
+    return null;
+  }
+
+  return prisma.assignment.update({
+    where: {
+      id: assignmentId,
+    },
+    data: {
+      ...data,
+      ...(data.dueDate && {
+        dueDate: new Date(data.dueDate),
+      }),
     },
   });
 }
