@@ -117,6 +117,9 @@ export async function updateAssignment(req: Request, res: Response) {
       });
     }
 
+    console.log("PATCH assignment ID:", req.params.id);
+    console.log("PATCH user ID:", req.user.id);
+
     const body = updateAssignmentSchema.parse(req.body);
 
     const assignmentId = req.params.id;
